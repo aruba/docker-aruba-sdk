@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  aruba_sdk:
+    container_name: aruba_sdk
+    image: aruba-sdk
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    privileged: true
+    user: root
+    volumes: 
+      - aruba_workspace:/home/aruba
+    command: tail -f /dev/null
+volumes:
+  aruba_workspace:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      # Create this directory first
+      device: /Users/karthikeyandhandapani/Documents/playground/aruba_sdk/dockerhub/temp/aruba_sdk

@@ -1,0 +1,58 @@
+- name: Build Step for Aruba SDK Docker Image
+  hosts: localhost
+  gather_facts: no
+  vars:
+    tmp_package_dir: ../tmp
+    aruba_docker_dir: ../docker_files/aruba_docker
+    pycentral_github_url: https://github.com/aruba/pycentral.git
+    ansible_central_role_url: https://github.com/aruba/aruba-central-ansible-role.git
+    ansible_aos_wlan_role_url: https://github.com/aruba/aos-wlan-ansible-role.git
+
+  tasks:
+    - name: Creates directory for CICD Installation in local machine
+      file:
+        path: "{{ tmp_package_dir }}"
+        state: directory
+
+    - name: Creates directory for docker volume in local machine
+      file:
+        path: "~/.aruba_sdk"
+        state: directory
+
+    - name: Creates directory for CICD Installation in local machine
+      file:
+        path: "{{ tmp_package_dir }}/aruba_sdk"
+        state: directory
+
+    - name: Clone the pycentral repository
+      git:
+        repo: "{{ pycentral_github_url }}"
+        dest: "{{ tmp_package_dir }}/aruba_sdk/python_central_sdk"
+
+    - name: Clone the ansible aos wlan central role repository
+      git:
+        repo: "{{ ansible_aos_wlan_role_url }}"
+        dest: "{{ tmp_package_dir }}/aruba_sdk/ansible_aos_role"
+
+    - name: Creates a tmp directory for sample scripts in local machine
+      file:
+        path: "{{ aruba_docker_dir }}/samples"
+        state: directory
+
+    - name: Copy the pycentral sample scripts to aruba_docker directory
+      ansible.builtin.copy:
+        src: "{{ tmp_package_dir }}/aruba_sdk/python_central_sdk/sample_scripts"
+        dest: "{{ aruba_docker_dir }}/samples/python_central"
+
+    - name: Copy the ansible aos wlan sample playbooks to aruba_docker directory
+      ansible.builtin.copy:
+        src: "{{ tmp_package_dir }}/aruba_sdk/ansible_aos_role/sample_playbooks"
+        dest: "{{ aruba_docker_dir }}/samples/ansible_aos"
+
+    # - name: Build Aruba SDK Docker Image from local Dockerfile
+    #   community.general.docker_image:
+    #     name: aruba_sdk
+    #     build:
+    #       path: "{{ aruba_docker_dir }}"
+    #     source: build
+    #     state: present

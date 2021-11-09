@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  aruba_sdk:
+    container_name: jenkins-aruba-sdk
+    image: arubahpe/aruba-sdk:jenkins-agent
+    restart: unless-stopped
+    privileged: true
+    user: root
+    volumes:
+      # Provide specific local system path in volumes section for 'aruba_workspace'
+      - aruba_workspace:/home/aruba
+    # command: tail -f /dev/null
+    init: true
+    environment:
+      # Mandatory env variables.
+      # Provide valid and reachable Jenkins Host URL. Port 50000 should be reachable too.
+      - JENKINS_URL=http://<jenkins-host-url>/
+      # Jenkins Agent Name and Secret obtained by creating a new agent in Jenkins Host.
+      - JENKINS_SECRET=<jenkins-agent-secret>
+      - JENKINS_AGENT_NAME=<jenkins-agent-name>
+
+# volumes:
+#   aruba_workspace:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       # Create this directory first
+#       device: <absolute-local-system-path-for-volume-mount>
+
+# networks:
+#   default:
+#     external: true
+#     # Provide docker network name if this node needs be part of an existing network
+#     name: <existing-docker-network-name>
